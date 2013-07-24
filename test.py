@@ -4,7 +4,7 @@ import logging
 from tempfile import NamedTemporaryFile
 import uuid
 
-from logfigure import load_config, LogLine
+from logfigure import load_config, LogLine, Logconfig
 
 class LogfigureTests(unittest.TestCase):
 
@@ -48,6 +48,24 @@ class LogLineTests(unittest.TestCase):
         self.failUnlessEqual(ll.logger.handler.class_args,
                              '("/some/path",)')
 
+    def test_target_null(self):
+        ll = LogLine("log info from somepkg to null")
+        self.failUnlessEqual(ll.logger.handler.log_target,
+                             'logfigure.NullHandler')
+        self.failUnlessEqual(ll.logger.handler.class_args,
+                             '()')
+
+class LogconfigTests(unittest.TestCase):
+
+    def test_root_set(self):
+        config = StringIO.StringIO("""log debug from all to stdout
+log info from test to /tmp/somefile.log""")
+        logconfig = Logconfig(config)
+        root_loggers = [x for x in logconfig.loggers if x.name == 'root']
+        self.failUnlessEqual(len(root_loggers), 1)
+        root_logger = root_loggers[0]
+        self.failUnlessEqual(root_logger.level, 'DEBUG')
+        self.failUnlessEqual(root_logger.handler.log_target, 'StreamHandler')
 
 if __name__ == "__main__":
     unittest.main()

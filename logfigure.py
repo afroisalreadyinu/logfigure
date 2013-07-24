@@ -165,6 +165,7 @@ datefmt=
 
 
 class Logconfig(object):
+
     def __init__(self, cfg_path):
         if hasattr(cfg_path, 'readlines'):
             lines = [x.strip() for x in cfg_path.readlines()]
@@ -174,7 +175,7 @@ class Logconfig(object):
             with open(cfg_path, 'r') as inp_file:
                 lines = [x.strip() for x in inp_file.readlines()]
         self.loglines = [LogLine(line) for line in lines
-                         if not line.startswith('#')]
+                         if line and not line.startswith('#')]
         for logline in self.loglines:
             if logline.log_from == '':
                 logline.logger.name = 'root'
