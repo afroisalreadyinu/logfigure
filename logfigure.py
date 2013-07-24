@@ -21,7 +21,7 @@ except ImportError:
             pass
     NULLHANDLER = 'logfigure.NullHandler'
 
-#todo  qualname for log_from
+
 #todo  tests
 
 class LogLine(object):

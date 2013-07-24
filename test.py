@@ -34,6 +34,19 @@ class LogLineTests(unittest.TestCase):
         self.failUnlessEqual(ll.logger.level, "INFO")
         self.failUnlessEqual(ll.logger.source, "somepkg.blah")
 
+    def test_target_stdout(self):
+        ll = LogLine("log info from somepkg to stdout")
+        self.failUnlessEqual(ll.logger.handler.log_target,
+                             'StreamHandler')
+        self.failUnlessEqual(ll.logger.handler.class_args,
+                             '(sys.stdout,)')
+
+    def test_target_file(self):
+        ll = LogLine("log info from somepkg to /some/path")
+        self.failUnlessEqual(ll.logger.handler.log_target,
+                             'FileHandler')
+        self.failUnlessEqual(ll.logger.handler.class_args,
+                             '("/some/path",)')
 
 
 if __name__ == "__main__":
