@@ -1,4 +1,4 @@
-Logfigure generates loggign configuration for the Python logging
+Logfigure generates logging configuration for the Python logging
 standard library. The accepted format is a very simple DSL close to
 natural language, and configuration in the file configuration format
 is generated. You can also use logfigure as a library to configure

@@ -11,5 +11,6 @@ setup(
     description = ("Logging configuration that respects your sanity"),
     install_requires = dependencies,
     packages=find_packages(),
-    entry_points = {'console_scripts': ['logfigure = logfigure:print_config']}
+    entry_points = {'console_scripts': ['logfigure = logfigure:print_config']},
+    url = "https://github.com/afroisalreadyinu/logfigure",
 )
