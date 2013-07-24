@@ -22,7 +22,7 @@ except ImportError:
     NULLHANDLER = 'logfigure.NullHandler'
 
 #todo  qualname for log_from
-#todo  simple tests
+#todo  tests
 
 class LogLine(object):
 
@@ -60,17 +60,19 @@ class LogLine(object):
                 else:
                     self.log = True
             elif not self.log_level:
-                self.log_level = level_synonyms[part] if part in level_synonyms else part
+                self.log_level = (level_synonyms[part]
+                                  if part in level_synonyms
+                                  else part.upper())
 
             elif not self.log_from_prefix:
                 if part not in ["to", "from"]:
                     raise ParseError('Log level should be followed either by from or to')
                 self.log_from_prefix = True
                 if part == 'to':
-                    self.log_from = 'all'
+                    self.log_from = ''
                     parts.append(part)
-            elif not self.log_from:
-                self.log_from = part
+            elif self.log_from is None:
+                self.log_from = '' if part == 'all' else part
             elif not self.log_to_prefix:
                 if part != "to":
                     raise ParseError('Log location should be preceded with "to"')
@@ -100,21 +102,26 @@ class LogLine(object):
         else:
             formatter = None
         handler = Handler(base_name, self.log_where, self.log_level, formatter)
-        return Logger(base_name, self.log_level, handler)
+        return Logger(base_name, self.log_level, self.log_from, handler)
 
 
 class Logger(object):
-    def __init__(self, name, level, handler):
+    def __init__(self, name, level, source, handler):
         self.name = name
         self.level = level
         self.handler = handler
+        self.source = source
 
     def __str__(self):
-        return """
+        section = """
 [logger_%(name)s]
 level=%(level)s
 handlers=%(handler)s
 """ % dict(name=self.name, level=self.level, handler=self.handler.name)
+        if self.source:
+            section += "qualname=%s\n" % self.source
+        return section
+
 
 
 class Handler(object):
@@ -140,7 +147,7 @@ class=%(log_target)s
 args=%(class_args)s
 """ % self.__dict__
         if self.formatter:
-            section += ("formatter=%(formatter_name)s\n" % self.formatter.name)
+            section += "formatter=%s\n" % self.formatter.name
         return section
 
 
@@ -169,7 +176,7 @@ class Logconfig(object):
         self.loglines = [LogLine(line) for line in lines
                          if not line.startswith('#')]
         for logline in self.loglines:
-            if logline.log_from == 'all':
+            if logline.log_from == '':
                 logline.logger.name = 'root'
                 break
 
