@@ -11,7 +11,16 @@ level_synonyms = {
     "all": "DEBUG"
 }
 
-#todo  default level when none specified for root
+try:
+    from logging import NullHandler
+    NULLHANDLER = 'NullHandler'
+except ImportError:
+    import logging
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
+    NULLHANDLER = 'logfigure.NullHandler'
+
 #todo  qualname for log_from
 #todo  simple tests
 
@@ -111,12 +120,15 @@ handlers=%(handler)s
 class Handler(object):
     def __init__(self, name, log_target, level, formatter):
         self.name = name
+        self.class_args = '()'
         if log_target == 'stdout':
             self.log_target = 'StreamHandler'
             self.class_args = '(sys.stdout,)'
         elif log_target.startswith('/'): #TODO correct this hack
             self.log_target = 'FileHandler'
             self.class_args = '("%s",)' % log_target
+        elif log_target == 'null': #TODO correct this hack
+            self.log_target = NULLHANDLER
         self.level = level
         self.formatter = formatter
 
@@ -128,7 +140,7 @@ class=%(log_target)s
 args=%(class_args)s
 """ % self.__dict__
         if self.formatter:
-            section += ("formatter=%(formatter_name)s" % self.formatter.name)
+            section += ("formatter=%(formatter_name)s\n" % self.formatter.name)
         return section
 
 
