@@ -18,6 +18,25 @@ class LogfigureTests(unittest.TestCase):
         with open(out_log.name, 'r') as log_out:
             self.failUnless(test_string in log_out.read())
 
+    def test_split(self):
+        out_log = NamedTemporaryFile(suffix='.log')
+        config = StringIO.StringIO('''
+log debug from all to stdout
+log all from mypkg.submodule to ''' + out_log.name + ''' as "%(asctime)s - %(name)s - %(levelname)s - %(message)s"''')
+        load_config(config)
+        logger = logging.getLogger('test')
+        stdout_string = str(uuid.uuid4())
+        logger.debug(stdout_string)
+
+        logger = logging.getLogger('mypkg.submodule')
+        fileout_string = str(uuid.uuid4())
+        logger.debug(fileout_string)
+        with open(out_log.name, 'r') as log_out:
+            contents = log_out.read()
+            self.failIf(stdout_string in contents)
+            self.failUnless(fileout_string in contents)
+
+
 class LogLineTests(unittest.TestCase):
 
     def test_source_can_be_omitted(self):

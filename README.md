@@ -1,8 +1,46 @@
 Logfigure generates logging configuration for the Python logging
-standard library. The accepted format is a very simple DSL close to
-natural language, and configuration in the file configuration format
-is generated. You can also use logfigure as a library to configure
-logging directly from the accepted format.
+standard library. It turns this:
+
+    log debug from all to stdout
+    log all from mypkg.submodule to /temp/blah.log as "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+Into this:
+
+    [loggers]
+    keys=root,tempblahlog_DEBUG
+    [handlers]
+    keys=stdout_DEBUG,tempblahlog_DEBUG
+    [formatters]
+    keys=tempblahlog_DEBUG
+
+    [logger_root]
+    level=DEBUG
+    handlers=stdout_DEBUG
+
+    [logger_tempblahlog_DEBUG]
+    level=DEBUG
+    handlers=tempblahlog_DEBUG
+    qualname=mypkg.submodule
+
+    [handler_stdout_DEBUG]
+    level=DEBUG
+    class=StreamHandler
+    args=(sys.stdout,)
+
+    [handler_tempblahlog_DEBUG]
+    level=DEBUG
+    class=FileHandler
+    args=("/temp/blah.log",)
+    formatter=tempblahlog_DEBUG
+
+    [formatter_tempblahlog_DEBUG]
+    format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+    datefmt=
+
+The accepted format is a very simple DSL close to natural language,
+and configuration in the file configuration format is generated. You
+can also use logfigure as a library to configure logging directly from
+the accepted format.
 
 Logfigure accepts a file consisting of lines that specify what to log
 where and in which format. The simplest configuration line is the
