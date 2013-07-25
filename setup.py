@@ -1,5 +1,5 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 
 dependencies = []
 
@@ -10,7 +10,7 @@ setup(
     author_email = "ulas.tuerkmen@gmail.com",
     description = ("Logging configuration that respects your sanity"),
     install_requires = dependencies,
-    packages=find_packages(),
+    packages=['logfigure'],
     entry_points = {'console_scripts': ['logfigure = logfigure:print_config']},
     url = "https://github.com/afroisalreadyinu/logfigure",
 )
