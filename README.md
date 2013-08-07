@@ -70,3 +70,11 @@ To convert a configuration file in this format, run `logfigure
 cfg_file_path`. This will print the converted data into standard
 out. In order to configure logging from a file, use
 `logfigure.load_config`.
+
+----
+TODO
+----
+
+To be added in the near future:
+
+* Email logger
